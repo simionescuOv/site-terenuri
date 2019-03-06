@@ -37,6 +37,8 @@ const lNume= ['Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Nov',
 }
   
   function clicu(id){
+      console.log('se apasat '+id)
+      
       let acum=new Date()
           ,acusha=Date.now()
           ,obTimp=formatTimp(acum)
@@ -51,3 +53,26 @@ const lNume= ['Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Nov',
       })
   }
 
+//clicu('foto18400m44')
+  
+  
+  /*
+    var ivue=new Vue({
+        el:'#app-id',
+        data:function(){
+            return{
+                textu:'vue functioneste'
+            }
+        },
+        create(){
+           XclicList.on('child_added', ss => {
+              let val=snapshot.val() 
+           })
+        },
+        methods:{
+            clicu:function(id){
+                
+            }
+        }
+    })
+    */
