@@ -13,9 +13,14 @@ const lNume= ['Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Nov',
   };
   firebase.initializeApp(config);
 
-  const rootRef=firebase.database().ref(),
-        clicList=firebase.database().ref('clicDatele')
-  
+  const //rootRef=firebase.database().ref(),
+        idfb='clicDatele',
+        id_dev='clic-development',
+        idcda='c-dev-arr',
+        id_v_cda='variabilele/i_cda',
+        clicList=firebase.database().ref(id_dev),
+        refVicda=firebase.database().ref(id_v_cda)
+        
   function formatTimp(date){
     let d=new Date(date),
 
@@ -40,14 +45,25 @@ const lNume= ['Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Nov',
       let acum=new Date()
           ,acusha=Date.now()
           ,obTimp=formatTimp(acum)
-          ,rNou=clicList.push()
+          ,rArrKey=clicList.push()
+          //,rDevArr=refDevArr.push()
           ,mmRez=obTimp.moment.toString()
           ,mls=acum.getMilliseconds()
-      rNou.set({
+         
+      rArrKey.set({
           acu:acusha,
           mmnt:mmRez,
           id:id,
           mls:mls
       })
+    refVicda.once('value', (ss) => {
+        let icda=ss.val()
+        firebase.database().ref(idcda+'/' + icda).set(id)
+        icda++
+        refVicda.set(icda)
+    })
+     
+     
+      
   }
 
