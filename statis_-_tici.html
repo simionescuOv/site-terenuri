@@ -37,8 +37,8 @@
   <h2>Ultimele 20 de Înregistrări</h2>
   <table id="table-recent"><thead><tr><th>Data și Ora</th><th>Acțiune</th></tr></thead><tbody></tbody></table>
 
-  <script src="https://gstatic.com"></script>
-  <script src="https://gstatic.com"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.5.9/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.5.9/firebase-database.js"></script>
   <script src="dbfb.js"></script>
   <script>
     firebase.database().ref("/").once("value").then(function(snapshot) {
@@ -89,6 +89,10 @@
         var dt = e.mmnt ? e.mmnt.split(" GMT").shift() : "Dată necunoscută";
         tbodyRecent.innerHTML += "<tr><td>" + dt + "</td><td>" + e.id + "</td></tr>";
       });
+    }).catch(function(err) {
+      var s = document.getElementById("status");
+      s.textContent = "Eroare la încărcarea datelor: " + (err && err.message ? err.message : err);
+      s.style.color = "#b00020";
     });
   </script>
 </body>
