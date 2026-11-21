@@ -56,7 +56,7 @@
       document.getElementById("total-clicks").textContent = clicks;
 
       var sorted = all.slice().sort(function(a, b) { return (b.acu || 0) - (a.acu || 0); });
-      var firstItem = sorted.shift();
+      var firstItem = sorted.slice(0, 1).shift();
       if (firstItem && firstItem.mmnt) {
         document.getElementById("last-date").textContent = firstItem.mmnt.split(" GMT").shift();
       }
@@ -80,10 +80,8 @@
       });
 
       var tbodyActions = document.querySelector("#table-actions tbody");
-      Object.entries(actions).sort(function(a, b) { return b.pop() - a.pop(); }).forEach(function(pair) {
-        var name = pair.shift();
-        var count = pair.pop();
-        tbodyActions.innerHTML += "<tr><td>" + name + "</td><td><strong>" + count + "</strong></td></tr>";
+      Object.keys(actions).sort(function(a, b) { return actions[b] - actions[a]; }).forEach(function(name) {
+        tbodyActions.innerHTML += "<tr><td>" + name + "</td><td><strong>" + actions[name] + "</strong></td></tr>";
       });
 
       var tbodyRecent = document.querySelector("#table-recent tbody");
@@ -91,9 +89,10 @@
         var dt = e.mmnt ? e.mmnt.split(" GMT").shift() : "Dată necunoscută";
         tbodyRecent.innerHTML += "<tr><td>" + dt + "</td><td>" + e.id + "</td></tr>";
       });
-    }).catch(function(err) {
-      document.getElementById("status").textContent = "Eroare Firebase: " + err.message;
     });
   </script>
 </body>
 </html>
+
+  
+
