@@ -37,66 +37,63 @@
   <h2>Ultimele 20 de Înregistrări</h2>
   <table id="table-recent"><thead><tr><th>Data și Ora</th><th>Acțiune</th></tr></thead><tbody></tbody></table>
 
+  <script src="https://gstatic.com"></script>
+  <script src="https://gstatic.com"></script>
+  <script src="dbfb.js"></script>
   <script>
-    var url = "https://" + "terena3gherghita" + "://";
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", url, true);
-    xhr.onload = function() {
-      if (xhr.status === 200) {
-        var data = JSON.parse(xhr.responseText);
-        var oldEntries = Object.values(data["clicDatele"] || {});
-        var newEntries = Object.values(data["clic-development"] || {});
-        var all = oldEntries.concat(newEntries).filter(function(e) { return e && e.id; });
+    firebase.database().ref("/").once("value").then(function(snapshot) {
+      var data = snapshot.val() || {};
+      var oldEntries = Object.values(data.clicDatele || {});
+      var newEntries = Object.values(data["clic-development"] || {});
+      var all = oldEntries.concat(newEntries).filter(function(e) { return e && e.id; });
 
-        var visits = all.filter(function(e) { return e.id === "incarcat index"; }).length;
-        var clicks = all.filter(function(e) { return e.id !== "incarcat index"; }).length;
+      var visits = all.filter(function(e) { return e.id === "incarcat index"; }).length;
+      var clicks = all.filter(function(e) { return e.id !== "incarcat index"; }).length;
 
-        document.getElementById("status").style.display = "none";
-        document.getElementById("summary").style.display = "flex";
-        document.getElementById("total-visits").textContent = visits;
-        document.getElementById("total-clicks").textContent = clicks;
+      document.getElementById("status").style.display = "none";
+      document.getElementById("summary").style.display = "flex";
+      document.getElementById("total-visits").textContent = visits;
+      document.getElementById("total-clicks").textContent = clicks;
 
-        var sorted = all.slice().sort(function(a, b) { return (b.acu || 0) - (a.acu || 0); });
-        if (sorted.length > 0 && sorted.mmnt) {
-          document.getElementById("last-date").textContent = sorted.mmnt.split(" GMT");
-        }
-
-        var years = {};
-        var actions = {};
-        all.forEach(function(e) {
-          var m = (e.mmnt || "").match(/\b20\d\d\b/);
-          var y = m ? m : "Fără dată";
-          if (!years[y]) years[y] = { v: 0, c: 0 };
-          if (e.id === "incarcat index") years[y].v++;
-          else {
-            years[y].c++;
-            actions[e.id] = (actions[e.id] || 0) + 1;
-          }
-        });
-
-        var tbodyYears = document.querySelector("#table-years tbody");
-        Object.keys(years).sort().reverse().forEach(function(y) {
-          tbodyYears.innerHTML += "<tr><td><strong>" + y + "</strong></td><td>" + years[y].v + "</td><td>" + years[y].c + "</td></tr>";
-        });
-
-        var tbodyActions = document.querySelector("#table-actions tbody");
-        Object.entries(actions).sort(function(a, b) { return b - a; }).forEach(function(item) {
-          tbodyActions.innerHTML += "<tr><td>" + item + "</td><td><strong>" + item + "</strong></td></tr>";
-        });
-
-        var tbodyRecent = document.querySelector("#table-recent tbody");
-        sorted.slice(0, 20).forEach(function(e) {
-          var dt = e.mmnt ? e.mmnt.split(" GMT") : "Dată necunoscută";
-          tbodyRecent.innerHTML += "<tr><td>" + dt + "</td><td>" + e.id + "</td></tr>";
-        });
-      } else {
-        document.getElementById("status").textContent = "Eroare server: " + xhr.status;
+      var sorted = all.slice().sort(function(a, b) { return (b.acu || 0) - (a.acu || 0); });
+      var firstItem = sorted.shift();
+      if (firstItem && firstItem.mmnt) {
+        document.getElementById("last-date").textContent = firstItem.mmnt.split(" GMT").shift();
       }
-    };
-    xhr.onerror = function() {
-      document.getElementById("status").textContent = "Eroare de conexiune la Firebase.";
-    };
-    xhr.send();
+
+      var years = {};
+      var actions = {};
+      all.forEach(function(e) {
+        var m = (e.mmnt || "").match(/\b20\d\d\b/);
+        var y = m ? m.shift() : "Fără dată";
+        if (!years[y]) years[y] = { v: 0, c: 0 };
+        if (e.id === "incarcat index") years[y].v++;
+        else {
+          years[y].c++;
+          actions[e.id] = (actions[e.id] || 0) + 1;
+        }
+      });
+
+      var tbodyYears = document.querySelector("#table-years tbody");
+      Object.keys(years).sort().reverse().forEach(function(y) {
+        tbodyYears.innerHTML += "<tr><td><strong>" + y + "</strong></td><td>" + years[y].v + "</td><td>" + years[y].c + "</td></tr>";
+      });
+
+      var tbodyActions = document.querySelector("#table-actions tbody");
+      Object.entries(actions).sort(function(a, b) { return b.pop() - a.pop(); }).forEach(function(pair) {
+        var name = pair.shift();
+        var count = pair.pop();
+        tbodyActions.innerHTML += "<tr><td>" + name + "</td><td><strong>" + count + "</strong></td></tr>";
+      });
+
+      var tbodyRecent = document.querySelector("#table-recent tbody");
+      sorted.slice(0, 20).forEach(function(e) {
+        var dt = e.mmnt ? e.mmnt.split(" GMT").shift() : "Dată necunoscută";
+        tbodyRecent.innerHTML += "<tr><td>" + dt + "</td><td>" + e.id + "</td></tr>";
+      });
+    }).catch(function(err) {
+      document.getElementById("status").textContent = "Eroare Firebase: " + err.message;
+    });
   </script>
 </body>
 </html>
